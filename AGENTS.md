@@ -1,0 +1,1 @@
+- Comments in code and configuration files (including `.editorconfig`) must be written in English.
