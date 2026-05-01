@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, VersioningType } from '@nestjs/common';
 import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
@@ -13,10 +13,17 @@ describe('App (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    app.enableVersioning({
+      type: VersioningType.URI,
+      defaultVersion: '1',
+    });
     await app.init();
   });
 
-  it('GET /', () => {
-    return request(app.getHttpServer()).get('/').expect(200).expect('');
+  it('GET /v1', () => {
+    return request(app.getHttpServer())
+      .get('/v1')
+      .expect(200)
+      .expect('hello world');
   });
 });
