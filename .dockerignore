@@ -1,0 +1,55 @@
+# Dependencies (installed in the image)
+node_modules
+.pnpm-store
+
+# Git and version control
+.git
+.gitignore
+.gitattributes
+
+# Build output and caches
+dist
+build
+.next
+.nuxt
+coverage
+.nyc_output
+*.tsbuildinfo
+
+# Environment and secrets (never bake into images)
+.env
+.env.*
+!.env.example
+
+# Logs and temp files
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+tmp
+temp
+
+# IDE and editor
+.idea
+.vscode
+*.swp
+*.swo
+.DS_Store
+
+# Tests (not needed for typical production runtime image)
+test
+**/*.spec.ts
+**/*.test.ts
+e2e
+
+# Documentation (not needed in the image)
+*.md
+
+# CI / tooling not needed inside the image
+.github
+.husky
+.editorconfig
+.prettierrc*
+.prettierignore
+eslint.config.*
+.eslintrc*
