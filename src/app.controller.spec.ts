@@ -8,7 +8,14 @@ describe('AppController', () => {
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
       controllers: [AppController],
-      providers: [AppService],
+      providers: [
+        {
+          provide: AppService,
+          useValue: {
+            getRoot: jest.fn().mockReturnValue('hello world'),
+          },
+        },
+      ],
     }).compile();
 
     appController = app.get<AppController>(AppController);

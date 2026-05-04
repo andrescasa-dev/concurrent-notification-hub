@@ -2,9 +2,11 @@ import { VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { ENVALID, type Config } from './config/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const env = app.get<Config>(ENVALID);
 
   app.enableVersioning({
     type: VersioningType.URI,
@@ -19,6 +21,6 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('docs', app, document);
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(env.PORT);
 }
 void bootstrap();

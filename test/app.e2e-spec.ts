@@ -20,6 +20,10 @@ describe('App (e2e)', () => {
     await app.init();
   });
 
+  afterEach(async () => {
+    await app.close();
+  });
+
   it('GET /v1', () => {
     return request(app.getHttpServer())
       .get('/v1')
