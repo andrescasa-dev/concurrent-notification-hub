@@ -3,8 +3,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { EnvalidModule } from 'nestjs-envalid';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AuthModule } from './auth/auth.module';
 import { ENVALID, validators, type Config } from './config/config';
 import { createTypeOrmOptions } from './config/typeorm.config';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -17,6 +19,8 @@ import { createTypeOrmOptions } from './config/typeorm.config';
       inject: [ENVALID],
       useFactory: (env: Config) => createTypeOrmOptions(env),
     }),
+    UsersModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

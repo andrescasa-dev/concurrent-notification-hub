@@ -25,6 +25,14 @@
 
 - **`docker-compose.yml`** — Postgres 16 for local dev; credentials from env; data in a named volume.
 
+### Authentication
+
+- **Users** — The API can represent people (or accounts) in persistence so behavior can be scoped per identity.
+- **Sign-in** — Callers prove who they are; successful sign-in yields a reusable credential the client sends on later requests.
+- **Protected routes** — Endpoints that require an authenticated identity reject anonymous access; public endpoints stay available where that matches the product.
+
+How sign-in and credentials are implemented may evolve; the stable idea is **identity, proof, and guarded operations**.
+
 ### Versioning and documentation
 
 - **Swagger** — Live docs at `/docs`, driven by decorators.
