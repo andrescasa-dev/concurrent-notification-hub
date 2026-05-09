@@ -21,6 +21,8 @@ export const environmentSpecs = {
   POSTGRES_PASSWORD: str(),
   POSTGRES_DB: str(),
   POSTGRES_HOST_PORT: port({ default: 5432 }),
+  /** Comma-separated list of allowed origins; empty = reflect request Origin (dev-friendly). */
+  CORS_ORIGIN: str({ default: '' }),
   JWT_SECRET: str(),
   JWT_EXPIRES_IN: str({ default: '1d' }),
 };
