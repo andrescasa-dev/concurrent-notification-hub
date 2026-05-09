@@ -1,9 +1,9 @@
-export function getCorsOrigin(): boolean | string[] {
-  const raw = process.env.CORS_ORIGIN?.trim();
-  if (!raw) {
+export function getCorsOrigin(raw: string): boolean | string[] {
+  const trimmed = raw.trim();
+  if (!trimmed) {
     return true;
   }
-  return raw
+  return trimmed
     .split(',')
     .map((o) => o.trim())
     .filter(Boolean);
