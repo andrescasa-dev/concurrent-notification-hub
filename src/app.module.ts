@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { ENVALID, validators, type Config } from './config/config';
 import { createTypeOrmOptions } from './config/typeorm.config';
 import { UsersModule } from './users/users.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { UsersModule } from './users/users.module';
     }),
     UsersModule,
     AuthModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
