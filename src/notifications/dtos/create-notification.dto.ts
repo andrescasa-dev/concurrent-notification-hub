@@ -1,7 +1,7 @@
 import { ApiExtraModels, ApiProperty, getSchemaPath } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsEnum, IsNotEmpty, ValidateNested } from 'class-validator';
-import { NotificationsChannelsEnum } from '../enums/notifications-chanels';
+import { NotificationsChannelsEnum } from '../constants/notifications-chanels';
 import { CreateEmailDto } from './create-email.dto';
 import { CreatePushDto } from './create-push.dto';
 import { CreateSmsDto } from './create-sms.dto';

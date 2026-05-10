@@ -16,9 +16,9 @@ import {
   ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
-import { CreateNotificationDto } from './dto/create-notification.dto';
-import { UpdateNotificationDto } from './dto/update-notification.dto';
-import { NotificationsService } from './notifications.service';
+import { CreateNotificationDto } from '../dtos/create-notification.dto';
+import { UpdateNotificationDto } from '../dtos/update-notification.dto';
+import { NotificationsService } from '../services/notifications.service';
 
 @ApiTags('Notifications')
 @Controller('notifications')
