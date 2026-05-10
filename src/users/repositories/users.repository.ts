@@ -11,7 +11,7 @@ export class UsersTypeOrmRepository implements IUsersRepository {
     private readonly repository: Repository<User>,
   ) {}
 
-  findById(id: string): Promise<User | null> {
+  findById(id: number): Promise<User | null> {
     return this.repository.findOne({ where: { id } });
   }
 

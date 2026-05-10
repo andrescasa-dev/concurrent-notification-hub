@@ -15,7 +15,7 @@ export class UsersService {
     return this.usersRepository.findByEmail(email);
   }
 
-  getById(id: string): Promise<User | null> {
+  getById(id: number): Promise<User | null> {
     return this.usersRepository.findById(id);
   }
 

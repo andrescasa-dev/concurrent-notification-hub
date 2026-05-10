@@ -12,9 +12,9 @@ import {
 
 @Entity({ name: 'users' })
 export class User {
-  @ApiProperty({ format: 'uuid' })
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
+  @ApiProperty({ example: 1 })
+  @PrimaryGeneratedColumn()
+  id!: number;
 
   @ApiProperty()
   @Column({ type: 'varchar', unique: true })

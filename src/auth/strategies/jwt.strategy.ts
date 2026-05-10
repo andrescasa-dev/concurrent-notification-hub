@@ -6,7 +6,7 @@ import { ENVALID } from '../../config/config';
 import { UsersService } from '../../users/services/users.service';
 
 export type JwtPayload = {
-  sub: string;
+  sub: number;
   email: string;
 };
 
