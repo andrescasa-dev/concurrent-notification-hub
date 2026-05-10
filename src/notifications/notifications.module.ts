@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { NotificationsChannelsEnum } from './constants/notifications-chanels';
+import { NOTIFICATIONS_REPOSITORY } from './constants/injection-tokens';
 import {
   NOTIFICATION_STRATEGIES,
   type NotificationStrategiesByChannel,
@@ -8,12 +10,15 @@ import { SimulatedGmailEmailClient } from './clients/email/simulated-gmail.email
 import { SimulatedPushClient } from './clients/push/simulated-push.client';
 import { SimulatedSmsClient } from './clients/sms/simulated-sms.client';
 import { NotificationsController } from './controllers/notifications.controller';
+import { Notification } from './entities/notification.entity';
+import { NotificationsTypeOrmRepository } from './repositories/notifications.repository';
 import { NotificationsService } from './services/notifications.service';
 import { EmailNotificationStrategy } from './strategies/email-notification.strategy';
 import { PushNotificationStrategy } from './strategies/push-notification.strategy';
 import { SmsNotificationStrategy } from './strategies/sms-notification.strategy';
 
 @Module({
+  imports: [TypeOrmModule.forFeature([Notification])],
   controllers: [NotificationsController],
   providers: [
     { provide: 'IEmailClient', useClass: SimulatedGmailEmailClient },
@@ -38,6 +43,10 @@ import { SmsNotificationStrategy } from './strategies/sms-notification.strategy'
         SmsNotificationStrategy,
         PushNotificationStrategy,
       ],
+    },
+    {
+      provide: NOTIFICATIONS_REPOSITORY,
+      useClass: NotificationsTypeOrmRepository,
     },
     NotificationsService,
   ],

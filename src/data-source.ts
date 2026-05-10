@@ -5,6 +5,7 @@ import { DataSource } from 'typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { join } from 'node:path';
 import { environmentSpecs } from './config/config';
+import { Notification } from './notifications/entities/notification.entity';
 import { User } from './users/entities/user.entity';
 
 const env = cleanEnv(process.env, environmentSpecs);
@@ -21,6 +22,6 @@ export default new DataSource({
   database: env.POSTGRES_DB,
   namingStrategy: new SnakeNamingStrategy(),
   synchronize: false,
-  entities: [User],
+  entities: [User, Notification],
   migrations: [join(__dirname, 'migrations', '*.{ts,js}')],
 });

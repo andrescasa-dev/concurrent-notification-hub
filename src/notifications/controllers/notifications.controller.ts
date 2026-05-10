@@ -3,21 +3,31 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiCreatedResponse,
+  ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
+import type { AuthenticatedUser } from '../../auth/models/authenticated-user';
 import { CreateNotificationDto } from '../dtos/create-notification.dto';
 import { UpdateNotificationDto } from '../dtos/update-notification.dto';
+import { Notification } from '../entities/notification.entity';
 import { NotificationsService } from '../services/notifications.service';
 
 @ApiTags('Notifications')
@@ -26,82 +36,100 @@ export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
 
   @Post()
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
   @ApiOperation({
-    summary: 'Crear una notificación',
+    summary: 'Create a notification',
     description:
-      'Crea una notificación y dispara su envío por el canal indicado. ' +
-      'El payload de `notification` se valida según el valor de `channel` (email | sms | push).',
+      'Creates a notification and triggers delivery on the selected channel. ' +
+      'The `notification` payload is validated according to `channel` (email | sms | push).',
   })
   @ApiCreatedResponse({
-    description: 'Notificación creada y encolada para envío.',
+    description: 'Notification created and persisted.',
+    type: Notification,
   })
   @ApiBadRequestResponse({
-    description: 'Payload inválido (falla la validación del DTO).',
+    description: 'Invalid payload (DTO validation failed).',
   })
-  create(@Body() createNotificationDto: CreateNotificationDto) {
-    return this.notificationsService.create(createNotificationDto);
+  create(
+    @Request() req: { user: AuthenticatedUser },
+    @Body() createNotificationDto: CreateNotificationDto,
+  ) {
+    return this.notificationsService.create(createNotificationDto, req.user.id);
   }
 
   @Get()
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
   @ApiOperation({
-    summary: 'Listar notificaciones',
-    description: 'Devuelve todas las notificaciones del usuario autenticado.',
+    summary: 'List notifications',
+    description: 'Returns all notifications for the authenticated user.',
   })
-  @ApiOkResponse({ description: 'Listado de notificaciones del usuario.' })
-  findAll() {
-    return this.notificationsService.findAll();
+  @ApiOkResponse({
+    description: 'List of notifications for the user.',
+    type: Notification,
+    isArray: true,
+  })
+  findAll(@Request() req: { user: AuthenticatedUser }) {
+    return this.notificationsService.findAll(req.user.id);
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Obtener una notificación por id' })
+  @ApiOperation({ summary: 'Get a notification by id' })
   @ApiParam({
     name: 'id',
-    description: 'Identificador numérico de la notificación.',
+    description: 'Numeric notification id.',
     example: 1,
   })
-  @ApiOkResponse({ description: 'Notificación encontrada.' })
+  @ApiOkResponse({ description: 'Notification found.' })
   @ApiNotFoundResponse({
-    description: 'No existe una notificación con ese id.',
+    description: 'No notification exists with that id.',
   })
-  findOne(@Param('id') id: string) {
-    return this.notificationsService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.notificationsService.findOne(id);
   }
 
   @Patch(':id')
   @ApiOperation({
-    summary: 'Actualizar parcialmente una notificación',
+    summary: 'Partially update a notification',
     description:
-      'Actualiza los campos enviados de una notificación existente. Acepta los mismos campos que `CreateNotificationDto` pero todos opcionales.',
+      'Updates the provided fields on an existing notification. Same shape as `CreateNotificationDto` but all fields optional.',
   })
   @ApiParam({
     name: 'id',
-    description: 'Identificador numérico de la notificación.',
+    description: 'Numeric notification id.',
     example: 1,
   })
-  @ApiOkResponse({ description: 'Notificación actualizada.' })
-  @ApiBadRequestResponse({ description: 'Payload inválido.' })
+  @ApiOkResponse({ description: 'Notification updated.' })
+  @ApiBadRequestResponse({ description: 'Invalid payload.' })
   @ApiNotFoundResponse({
-    description: 'No existe una notificación con ese id.',
+    description: 'No notification exists with that id.',
   })
   update(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateNotificationDto: UpdateNotificationDto,
   ) {
-    return this.notificationsService.update(+id, updateNotificationDto);
+    return this.notificationsService.update(id, updateNotificationDto);
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Eliminar una notificación' })
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Delete a notification' })
   @ApiParam({
     name: 'id',
-    description: 'Identificador numérico de la notificación.',
+    description: 'Numeric notification id.',
     example: 1,
   })
-  @ApiOkResponse({ description: 'Notificación eliminada.' })
+  @ApiNoContentResponse({ description: 'Notification deleted.' })
   @ApiNotFoundResponse({
-    description: 'No existe una notificación con ese id.',
+    description: 'No notification exists with that id.',
   })
-  remove(@Param('id') id: string) {
-    return this.notificationsService.remove(+id);
+  remove(
+    @Request() req: { user: AuthenticatedUser },
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.notificationsService.remove(id, req.user.id);
   }
 }

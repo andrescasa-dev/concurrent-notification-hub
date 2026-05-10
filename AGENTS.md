@@ -1,1 +1,2 @@
 - For context about this project read [docs_ia/PROYECT.md](docs_ia/PROYECT.md).
+- the code base must be written in English
