@@ -90,26 +90,36 @@ export class NotificationsController {
   }
 
   @Patch(':id')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Partially update a notification',
     description:
-      'Updates the provided fields on an existing notification. Same shape as `CreateNotificationDto` but all fields optional.',
+      'Updates stored fields (`title`, `content`, `recipient`) on the authenticated user’s notification. Does not change the channel or trigger a new delivery.',
   })
   @ApiParam({
     name: 'id',
     description: 'Numeric notification id.',
     example: 1,
   })
-  @ApiOkResponse({ description: 'Notification updated.' })
+  @ApiOkResponse({
+    description: 'Notification updated.',
+    type: Notification,
+  })
   @ApiBadRequestResponse({ description: 'Invalid payload.' })
   @ApiNotFoundResponse({
-    description: 'No notification exists with that id.',
+    description: 'No notification exists with that id for this user.',
   })
   update(
+    @Request() req: { user: AuthenticatedUser },
     @Param('id', ParseIntPipe) id: number,
     @Body() updateNotificationDto: UpdateNotificationDto,
   ) {
-    return this.notificationsService.update(id, updateNotificationDto);
+    return this.notificationsService.update(
+      id,
+      req.user.id,
+      updateNotificationDto,
+    );
   }
 
   @Delete(':id')

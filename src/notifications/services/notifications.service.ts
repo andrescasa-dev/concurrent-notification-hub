@@ -9,6 +9,7 @@ import {
   NOTIFICATION_STRATEGIES,
   type NotificationStrategiesByChannel,
 } from '../constants/strategy.tokens';
+import { NotificationDeliveryStatus } from '../constants/notification-delivery-status';
 import { CreateNotificationDto } from '../dtos/create-notification.dto';
 import { UpdateNotificationDto } from '../dtos/update-notification.dto';
 import type { Notification } from '../entities/notification.entity';
@@ -38,12 +39,14 @@ export class NotificationsService {
     // structured logging, traces, queues, etc., instead of console.log here.
     console.log(sendResult);
 
-    const { title, content } = createNotificationDto.notification;
+    const { title, content, recipient } = createNotificationDto.notification;
     return this.notificationsRepository.create({
       userId,
       title,
       content,
       channel: createNotificationDto.channel,
+      recipient,
+      status: NotificationDeliveryStatus.SENT,
     });
   }
 
@@ -55,13 +58,20 @@ export class NotificationsService {
     return `This action returns a #${id} notification`;
   }
 
-  update(
+  async update(
     id: number,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- TODO: usar al implementar actualización
+    userId: number,
     updateNotificationDto: UpdateNotificationDto,
-  ): string {
-    // TODO: implementar actualización
-    return `This action updates a #${id} notification`;
+  ): Promise<Notification> {
+    const updated = await this.notificationsRepository.updateByIdAndUserId(
+      id,
+      userId,
+      updateNotificationDto,
+    );
+    if (!updated) {
+      throw new NotFoundException();
+    }
+    return updated;
   }
 
   async remove(id: number, userId: number): Promise<void> {
