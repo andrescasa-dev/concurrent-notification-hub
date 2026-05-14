@@ -19,11 +19,14 @@
 
 ### Testing
 
-- **Jest** — Configs in `jest/` (`unit.config.cjs`, `e2e.json`, `coverage.config.cjs`); unit tests under `src/**/*.spec.ts`, e2e under `test/` and `src/**/*.e2e-spec.ts`; shared test utilities in `test/utils/`.
+- **Jest** — Configs in `test/jest/` (`unit.config.cjs`, `e2e.json`, `coverage.config.cjs`); unit tests under `src/**/*.spec.ts`, e2e under `test/` and `src/**/*.e2e-spec.ts`; shared test utilities in `test/utils/`.
 
 ### Local services (optional)
 
-- **`docker-compose.yml`** — Postgres 16 for local dev; credentials from env; data in a named volume.
+- **`docker-compose.yml`** — Postgres 16 for local dev; credentials from env; data in a named volume. The file sets Compose **`name: thc-mentoria-notifications-dev`**, so this stack is its own project (network, resources) separate from the test database.
+- **`docker-compose.test.yml`** — Ephemeral Postgres 16 on host port **5433** for e2e / local test runs (fixed `test` / `test` / `thc_test`). It uses **`name: thc-mentoria-notifications-test`**, so `docker compose -f docker-compose.test.yml down` (even with `--remove-orphans`) does **not** tear down the dev Postgres from the default compose file.
+
+Typical commands: `docker compose up -d` for dev; `docker compose -f docker-compose.test.yml up -d` for test. You do not need a `-p` flag unless you want to override the project name.
 
 ### Authentication
 

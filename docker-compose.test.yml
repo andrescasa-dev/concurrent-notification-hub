@@ -1,3 +1,5 @@
+name: thc-mentoria-notifications-test
+
 services:
   postgres-test:
     image: postgres:16-alpine

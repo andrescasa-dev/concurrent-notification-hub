@@ -1,6 +1,7 @@
 const path = require('path');
 
-const repoRoot = path.resolve(__dirname, '..');
+/** Repository root (this file lives in `test/jest/`). */
+const repoRoot = path.resolve(__dirname, '../..');
 
 /** @type {import('jest').Config} */
 module.exports = {

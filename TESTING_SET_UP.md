@@ -13,22 +13,22 @@ This document describes how automated tests are wired in this NestJS API: where 
 
 | Location | Purpose |
 | -------- | ------- |
-| [`jest/unit.config.cjs`](jest/unit.config.cjs) | Unit tests only: `rootDir` is `src/`, files match `*.spec.ts`. |
-| [`jest/e2e.json`](jest/e2e.json) | Standalone e2e run: repo root as `rootDir`, files match `*.e2e-spec.ts`. |
-| [`jest/coverage.config.cjs`](jest/coverage.config.cjs) | Single command that runs **two Jest projects** (unit + integration/e2e) and merges coverage. |
+| [`test/jest/unit.config.cjs`](test/jest/unit.config.cjs) | Unit tests only: `rootDir` is `src/`, files match `*.spec.ts`. |
+| [`test/jest/e2e.json`](test/jest/e2e.json) | Standalone e2e run: repo root as `rootDir`, files match `*.e2e-spec.ts`. |
+| [`test/jest/coverage.config.cjs`](test/jest/coverage.config.cjs) | Single command that runs **two Jest projects** (unit + integration/e2e) and merges coverage. |
 | [`test/utils/`](test/utils/) | Shared test utilities used by e2e (env loading, DB global setup, Nest bootstrap, DB truncate). |
 | `test/` and `src/**/` | E2e spec files (`*.e2e-spec.ts`) can live under `test/` or next to feature code under `src/`. |
 
-Jest configs under `jest/` resolve the **repository root** with `path.resolve(__dirname, '..')` so paths and coverage output stay correct even though the config files are not at the repo root.
+Jest configs live under `test/jest/`. The `.cjs` configs resolve the **repository root** with `path.resolve(__dirname, '../..')` so `coverage/` and test discovery stay correct relative to the repo. The `e2e.json` file sets `"rootDir": "../.."` (relative to `test/jest/`) for the same reason. The whole `test/` tree is excluded from `tsconfig.build.json`, so Nest’s production build does not emit test or Jest config files.
 
 ## npm scripts
 
 | Script | What it runs |
 | ------ | -------------- |
-| `pnpm test` / `pnpm test:unit` | Jest with [`jest/unit.config.cjs`](jest/unit.config.cjs). |
+| `pnpm test` / `pnpm test:unit` | Jest with [`test/jest/unit.config.cjs`](test/jest/unit.config.cjs). |
 | `pnpm test:watch` | Same unit config with `--watch`. |
-| `pnpm test:e2e` | Jest with [`jest/e2e.json`](jest/e2e.json), `--runInBand` (serial workers for DB safety). |
-| `pnpm test:cov` | Jest with [`jest/coverage.config.cjs`](jest/coverage.config.cjs), `--coverage`, `--runInBand`. |
+| `pnpm test:e2e` | Jest with [`test/jest/e2e.json`](test/jest/e2e.json), `--runInBand` (serial workers for DB safety). |
+| `pnpm test:cov` | Jest with [`test/jest/coverage.config.cjs`](test/jest/coverage.config.cjs), `--coverage`, `--runInBand`. |
 | `pnpm test:all` | Unit then e2e (`test` then `test:e2e`). |
 | `pnpm test:debug` | Node inspector + Jest on the **unit** config. |
 
@@ -56,12 +56,12 @@ Shared helpers:
 
 ## Coverage (`test:cov`)
 
-[`jest/coverage.config.cjs`](jest/coverage.config.cjs) uses Jest **`projects`**:
+[`test/jest/coverage.config.cjs`](test/jest/coverage.config.cjs) uses Jest **`projects`**:
 
-1. **`unit`** — same shape as `jest/unit.config.cjs` (specs under `src/`, coverage from `src` with spec/e2e files excluded).
+1. **`unit`** — same shape as `test/jest/unit.config.cjs` (specs under `src/`, coverage from `src` with spec/e2e files excluded).
 2. **`integration`** — same behaviour as the standalone e2e config (including `setupFiles`, `globalSetup`, single worker), with `collectCoverageFrom` scoped to `src/**/*.ts` so the HTML/lcov report maps to application code.
 
-The e2e block is **duplicated** between `jest/e2e.json` and the `integration` project on purpose: one entry point for day-to-day e2e, another for a single combined coverage run without merging incompatible `collectCoverageFrom` defaults across different `rootDir` values.
+The e2e block is **duplicated** between `test/jest/e2e.json` and the `integration` project on purpose: one entry point for day-to-day e2e, another for a single combined coverage run without merging incompatible `collectCoverageFrom` defaults across different `rootDir` values.
 
 ## Conventions
 
