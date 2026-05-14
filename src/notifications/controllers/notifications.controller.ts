@@ -31,7 +31,7 @@ import { Notification } from '../entities/notification.entity';
 import { NotificationsService } from '../services/notifications.service';
 
 @ApiTags('Notifications')
-@Controller('notifications')
+@Controller({ path: 'notifications', version: '1' })
 export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
 

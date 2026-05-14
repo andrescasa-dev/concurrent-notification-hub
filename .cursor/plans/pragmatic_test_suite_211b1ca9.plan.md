@@ -1,37 +1,37 @@
 ---
 name: Pragmatic Test Suite
-overview: "Suite minimalista: 4 archivos, ~22 casos, que cubren las piezas con lógica real (XSS escaping, discriminador de DTO) y los flujos HTTP completos con base de datos real. SMS y push strategies, repositorios, y servicios de delegación quedan cubiertos de forma indirecta por los tests e2e."
+overview: 'Suite minimalista: 4 archivos, ~22 casos, que cubren las piezas con lógica real (XSS escaping, discriminador de DTO) y los flujos HTTP completos con base de datos real. SMS y push strategies, repositorios, y servicios de delegación quedan cubiertos de forma indirecta por los tests e2e.'
 todos:
   - id: setup-docker
-    content: "Create docker-compose.test.yml with postgres-test service on port 5433 (ephemeral, no volume)"
-    status: pending
+    content: Create docker-compose.test.yml with postgres-test service on port 5433 (ephemeral, no volume)
+    status: completed
   - id: setup-env
-    content: "Create .env.test with NODE_ENV=test, POSTGRES_HOST=localhost, POSTGRES_HOST_PORT=5433, POSTGRES_DB=thc_test, POSTGRES_USER, POSTGRES_PASSWORD, JWT_SECRET=test-secret, JWT_EXPIRES_IN=1d"
-    status: pending
+    content: Create .env.test with NODE_ENV=test, POSTGRES_HOST=localhost, POSTGRES_HOST_PORT=5433, POSTGRES_DB=thc_test, POSTGRES_USER, POSTGRES_PASSWORD, JWT_SECRET=test-secret, JWT_EXPIRES_IN=1d
+    status: completed
   - id: setup-jest-e2e
-    content: "Update test/jest-e2e.json to load .env.test via globalSetup and add runInBand:true for DB isolation"
-    status: pending
+    content: Update test/jest-e2e.json to load .env.test via globalSetup and add runInBand:true for DB isolation
+    status: completed
   - id: setup-global-setup
-    content: "Create test/setup.ts — global setup that loads .env.test, creates a TypeORM DataSource and runs all migrations on the test DB"
-    status: pending
+    content: Create test/setup.ts — global setup that loads .env.test, creates a TypeORM DataSource and runs all migrations on the test DB
+    status: completed
   - id: setup-truncate
-    content: "Create test/truncate.ts — helper that exports truncateAll(dataSource) running TRUNCATE users, notifications RESTART IDENTITY CASCADE"
-    status: pending
+    content: Create test/truncate.ts — helper that exports truncateAll(dataSource) running TRUNCATE users, notifications RESTART IDENTITY CASCADE
+    status: completed
   - id: setup-scripts
-    content: "Add test:unit and test:e2e scripts to package.json"
-    status: pending
+    content: Add test:unit and test:e2e scripts to package.json
+    status: completed
   - id: unit-email-strategy
-    content: "Write src/notifications/strategies/email-notification.strategy.spec.ts (4 cases: happy path, htmlBody structure, XSS escaping, wrong channel guard)"
-    status: pending
+    content: 'Write src/notifications/strategies/email-notification.strategy.spec.ts (4 cases: happy path, htmlBody structure, XSS escaping, wrong channel guard)'
+    status: completed
   - id: unit-dto
-    content: "Write src/notifications/dtos/create-notification.dto.spec.ts (5 cases: 3 valid channels pass, email with phone recipient fails, sms with 161-char content fails)"
-    status: pending
+    content: 'Write src/notifications/dtos/create-notification.dto.spec.ts (5 cases: 3 valid channels pass, email with phone recipient fails, sms with 161-char content fails)'
+    status: completed
   - id: e2e-auth-users
-    content: "Write test/auth-users.e2e-spec.ts (5 cases: register, duplicate email 409, login OK, login wrong password 401, GET /users/me)"
-    status: pending
+    content: 'Write test/auth-users.e2e-spec.ts (5 cases: register, duplicate email 409, login OK, login wrong password 401, GET /users/me)'
+    status: completed
   - id: e2e-notifications
-    content: "Write test/notifications.e2e-spec.ts (8 cases: create per channel, 401 without token, ownership isolation on GET, PATCH own vs other, DELETE own)"
-    status: pending
+    content: 'Write test/notifications.e2e-spec.ts (8 cases: create per channel, 401 without token, ownership isolation on GET, PATCH own vs other, DELETE own)'
+    status: completed
 isProject: false
 ---
 
@@ -56,7 +56,7 @@ services:
     image: postgres:16-alpine
     container_name: thc-postgres-test
     ports:
-      - "5433:5432"
+      - '5433:5432'
     environment:
       POSTGRES_USER: test
       POSTGRES_PASSWORD: test
@@ -287,7 +287,7 @@ Los tests e2e dependen de toda la infraestructura de setup. El orden de implemen
 **Setup (infraestructura — sin casos de test):**
 
 | Archivo                   | Acción          |
-|---------------------------|-----------------|
+| ------------------------- | --------------- |
 | `docker-compose.test.yml` | Crear           |
 | `.env.test`               | Crear           |
 | `test/setup.ts`           | Crear           |
@@ -298,7 +298,7 @@ Los tests e2e dependen de toda la infraestructura de setup. El orden de implemen
 **Tests:**
 
 | Archivo                               | Tipo     | Casos   |
-|---------------------------------------|----------|---------|
+| ------------------------------------- | -------- | ------- |
 | `email-notification.strategy.spec.ts` | Unit     | 4       |
 | `create-notification.dto.spec.ts`     | Unit     | 5       |
 | `auth-users.e2e-spec.ts`              | E2E + DB | 5       |

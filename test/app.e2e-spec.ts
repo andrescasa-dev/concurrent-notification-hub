@@ -1,23 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication, VersioningType } from '@nestjs/common';
-import request from 'supertest';
-import { App } from 'supertest/types';
-import { AppModule } from './../src/app.module';
+import type { INestApplication } from '@nestjs/common';
+import { createE2EApp, createHttpAgent } from './e2e-bootstrap';
 
 describe('App (e2e)', () => {
-  let app: INestApplication<App>;
+  let app: INestApplication;
 
   beforeEach(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
-    app.enableVersioning({
-      type: VersioningType.URI,
-      defaultVersion: '1',
-    });
-    await app.init();
+    app = await createE2EApp();
   });
 
   afterEach(async () => {
@@ -25,9 +13,6 @@ describe('App (e2e)', () => {
   });
 
   it('GET /v1', () => {
-    return request(app.getHttpServer())
-      .get('/v1')
-      .expect(200)
-      .expect('hello world');
+    return createHttpAgent(app).get('/v1').expect(200).expect('hello world');
   });
 });
