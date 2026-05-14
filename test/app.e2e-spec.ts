@@ -1,5 +1,5 @@
 import type { INestApplication } from '@nestjs/common';
-import { createE2EApp, createHttpAgent } from './e2e-bootstrap';
+import { createE2EApp, createHttpAgent } from './utils/e2e-bootstrap';
 
 describe('App (e2e)', () => {
   let app: INestApplication;

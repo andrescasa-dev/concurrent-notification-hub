@@ -19,7 +19,7 @@
 
 ### Testing
 
-- **Jest** — Unit (`src/**/*.spec.ts`) and e2e (`test/`).
+- **Jest** — Configs in `jest/` (`unit.config.cjs`, `e2e.json`, `coverage.config.cjs`); unit tests under `src/**/*.spec.ts`, e2e under `test/` and `src/**/*.e2e-spec.ts`; shared test utilities in `test/utils/`.
 
 ### Local services (optional)
 

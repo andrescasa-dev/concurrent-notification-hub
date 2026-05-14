@@ -4,15 +4,15 @@ import { cleanEnv } from 'envalid';
 import { join } from 'node:path';
 import { DataSource } from 'typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
-import { environmentSpecs } from '../src/config/config';
-import { Notification } from '../src/notifications/entities/notification.entity';
-import { User } from '../src/users/entities/user.entity';
+import { environmentSpecs } from '../../src/config/config';
+import { Notification } from '../../src/notifications/entities/notification.entity';
+import { User } from '../../src/users/entities/user.entity';
 
 /**
  * Jest globalSetup: runs once before the e2e suite. Applies migrations to the test DB.
  */
 export default async function globalSetup(): Promise<void> {
-  dotenv.config({ path: join(__dirname, '..', '.env.test') });
+  dotenv.config({ path: join(__dirname, '..', '..', '.env.test') });
   const env = cleanEnv(process.env, environmentSpecs);
 
   const dataSource = new DataSource({

@@ -8,7 +8,7 @@ import { Reflector } from '@nestjs/core';
 import { Test, type TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import type { App } from 'supertest/types';
-import { AppModule } from '../src/app.module';
+import { AppModule } from '../../src/app.module';
 
 /**
  * Supertest agent: Nest's `getHttpServer()` is typed as `any`; supertest expects `App`.

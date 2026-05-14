@@ -1,8 +1,8 @@
 import type { INestApplication } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { NotificationsChannelsEnum } from '../src/notifications/constants/notifications-chanels';
-import { createE2EApp, createHttpAgent } from './e2e-bootstrap';
-import { truncateAll } from './truncate';
+import { createE2EApp, createHttpAgent } from './utils/e2e-bootstrap';
+import { truncateAll } from './utils/truncate';
 
 const pushRecipient = 'a'.repeat(32);
 

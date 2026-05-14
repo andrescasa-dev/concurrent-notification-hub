@@ -1,7 +1,7 @@
 import type { INestApplication } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import { createE2EApp, createHttpAgent } from '../../test/e2e-bootstrap';
-import { truncateAll } from '../../test/truncate';
+import { createE2EApp, createHttpAgent } from '../../test/utils/e2e-bootstrap';
+import { truncateAll } from '../../test/utils/truncate';
 
 type UserResponseBody = {
   id: number;
