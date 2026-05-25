@@ -157,6 +157,15 @@ Brief rationale for the main Phase 1 design choices. Expand each item for detail
 </details>
 
 <details>
+  <summary><b>Git hooks (Husky + lint-staged)</b></summary>
+
+**Problem:** Without local checks, unformatted or lint-failing code can reach the remote before CI catches it, slowing review and breaking the pipeline.
+
+**Decision:** **Husky** runs a **pre-commit** hook that invokes **lint-staged** on staged files only. Each matching file is formatted with **Prettier** (`--write`) and linted with **ESLint** (`--fix`); fixes are re-staged automatically. Hooks install on `pnpm install` via the `prepare` script. Full-repo checks remain available with `pnpm format` and `pnpm lint`; CI still runs the complete lint and test suite.
+
+</details>
+
+<details>
   <summary><b>CI/CD (CircleCI)</b></summary>
 
 **Problem:** Without automated checks, regressions reach main and environments diverge from what was reviewed locally.
@@ -182,7 +191,7 @@ Brief rationale for the main Phase 1 design choices. Expand each item for detail
 | ---------------------------- | ---------------------------------------------------------------------------------- |
 | **Backend Core**             | Node.js 24, NestJS 11, TypeScript, Passport (JWT / Local), class-validator, Helmet |
 | **Database & Persistence**   | PostgreSQL 16, TypeORM, programmatic migrations                                    |
-| **Dev Quality & Automation** | pnpm, Jest, ESLint, Prettier, Docker Compose, TypeORM CLI (`migration:`\* scripts) |
+| **Dev Quality & Automation** | pnpm, Jest, ESLint, Prettier, Husky, lint-staged, Docker Compose, TypeORM CLI (`migration:`\* scripts) |
 
 ---
 
