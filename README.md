@@ -60,70 +60,7 @@ In **Phase 1**, this engine **centralizes** authenticated users’ notification 
 Brief rationale for the main Phase 1 design choices. Expand each item for details.
 
 <details>
-  <summary><b>Clean architecture (layers and client boundary)</b></summary>
-
-**Problem:** Mixing HTTP, business rules, SQL, and third-party HTTP calls in one module creates tight coupling and makes the system hard to test or evolve.
-
-**Decision:** The codebase follows a **clean, layered layout**: controllers handle HTTP, services orchestrate use cases, repositories isolate persistence, strategies own channel-specific send rules, and a dedicated **client layer** (`clients/email`, `clients/sms`, `clients/push`) talks to external providers behind interfaces (`IEmailClient`, `ISmsClient`, `IPushClient`). Inward dependencies point at abstractions; infrastructure stays at the edges.
-
-</details>
-
-<details>
-  <summary><b>Strategy pattern (notification channels)</b></summary>
-
-**Problem:** Channel logic tends to accumulate in a single service (`if channel === email …`) so every new provider forces edits to existing code and violates the **Open/Closed** principle.
-
-**Decision:** Each channel (Email, SMS, Push) is a `NotificationSendingStrategy`. The service resolves the implementation from `channel` and calls `send()` without knowing provider details. New channels are added by registering another strategy, not by branching in the core.
-
-</details>
-
-<details>
-  <summary><b>Discriminated DTO (<code>channel</code> + <code>notification</code>)</b></summary>
-
-**Problem:** A single flat body cannot enforce different required fields per channel (recipient email vs. phone vs. device token) without leaking validation into the service layer.
-
-**Decision:** `CreateNotificationDto` carries a `channel` discriminator and a nested `notification` object whose class is selected at runtime (`CreateEmailDto`, `CreateSmsDto`, `CreatePushDto`). Validation and Swagger `oneOf` stay aligned with the chosen channel before any strategy runs.
-
-</details>
-
-<details>
-  <summary><b>Simulated providers (client layer)</b></summary>
-
-**Problem:** Wiring real Gmail, Twilio, or FCM in a take-home adds API keys, network flakiness, and review friction without proving stronger Node/Nest design skills.
-
-**Decision:** External sends go through the **client layer** with **simulated implementations** (`SimulatedGmailEmailClient`, `SimulatedSmsClient`, `SimulatedPushClient`) that return deterministic IDs and log behavior. Strategies still exercise real channel rules (validation, templates, length limits). The goal is to demonstrate architecture and Node expertise—not to ship production traffic. Swapping in real clients later is a module binding change, not a rewrite of strategies or services.
-
-</details>
-
-<details>
-  <summary><b>Passport (authentication)</b></summary>
-
-**Problem:** Hand-rolled auth in controllers couples HTTP handlers to one login mechanism and makes it costly to add OAuth, API keys, or other flows later.
-
-**Decision:** **Passport** with pluggable strategies—`LocalStrategy` for sign-in, `JwtStrategy` for protected routes—keeps verification in one place. Guards stay thin; swapping or extending auth means a new strategy, not rewriting business code. Protected notification routes are scoped to the authenticated owner.
-
-</details>
-
-<details>
-  <summary><b>Repository layer (persistence)</b></summary>
-
-**Problem:** Services that call TypeORM directly are hard to unit-test and tightly bound to SQL/ORM details, which increases friction when persistence needs to change.
-
-**Decision:** Domain services depend on `UsersRepository` and `NotificationsRepository` interfaces, injected via tokens, with TypeORM implementations behind them. Persistence queries live at the boundary; services express intent (`findAllByUserId`, `updateByIdAndUserId`) without ORM leakage.
-
-</details>
-
-<details>
-  <summary><b>Controlled migrations (<code>synchronize: false</code>)</b></summary>
-
-**Problem:** Letting the ORM auto-sync schema in production risks silent drift, data loss, and environments that do not match each other.
-
-**Decision:** **PostgreSQL** schema evolves only through **versioned TypeORM migrations** checked into the repo. `synchronize: false` keeps the database state explicit and reviewable; dev, test, and CI apply the same migration chain (`pnpm migration:run`) so schema integrity is a deliberate act, not a side effect of booting the app.
-
-</details>
-
-<details>
-  <summary><b>Pragmatic testing + dedicated integration database</b></summary>
+  <summary><b>testing - Pragmatic testing + dedicated integration database</b></summary>
 
 **Problem:** Mocking everything gives fast tests but misses migration bugs, constraints, and real query behavior; sharing the dev database with tests causes flaky runs and polluted local data.
 
@@ -139,7 +76,70 @@ Brief rationale for the main Phase 1 design choices. Expand each item for detail
 </details>
 
 <details>
-  <summary><b>Swagger / live API documentation</b></summary>
+  <summary><b>feature - Clean architecture (layers and client boundary)</b></summary>
+
+**Problem:** Mixing HTTP, business rules, SQL, and third-party HTTP calls in one module creates tight coupling and makes the system hard to test or evolve.
+
+**Decision:** The codebase follows a **clean, layered layout**: controllers handle HTTP, services orchestrate use cases, repositories isolate persistence, strategies own channel-specific send rules, and a dedicated **client layer** (`clients/email`, `clients/sms`, `clients/push`) talks to external providers behind interfaces (`IEmailClient`, `ISmsClient`, `IPushClient`). Inward dependencies point at abstractions; infrastructure stays at the edges.
+
+</details>
+
+<details>
+  <summary><b>feature - Strategy pattern (notification channels)</b></summary>
+
+**Problem:** Channel logic tends to accumulate in a single service (`if channel === email …`) so every new provider forces edits to existing code and violates the **Open/Closed** principle.
+
+**Decision:** Each channel (Email, SMS, Push) is a `NotificationSendingStrategy`. The service resolves the implementation from `channel` and calls `send()` without knowing provider details. New channels are added by registering another strategy, not by branching in the core.
+
+</details>
+
+<details>
+  <summary><b>feature - Discriminated DTO (<code>channel</code> + <code>notification</code>)</b></summary>
+
+**Problem:** A single flat body cannot enforce different required fields per channel (recipient email vs. phone vs. device token) without leaking validation into the service layer.
+
+**Decision:** `CreateNotificationDto` carries a `channel` discriminator and a nested `notification` object whose class is selected at runtime (`CreateEmailDto`, `CreateSmsDto`, `CreatePushDto`). Validation and Swagger `oneOf` stay aligned with the chosen channel before any strategy runs.
+
+</details>
+
+<details>
+  <summary><b>feature - Simulated providers (client layer)</b></summary>
+
+**Problem:** Wiring real Gmail, Twilio, or FCM in a take-home adds API keys, network flakiness, and review friction without proving stronger Node/Nest design skills.
+
+**Decision:** External sends go through the **client layer** with **simulated implementations** (`SimulatedGmailEmailClient`, `SimulatedSmsClient`, `SimulatedPushClient`) that return deterministic IDs and log behavior. Strategies still exercise real channel rules (validation, templates, length limits). The goal is to demonstrate architecture and Node expertise—not to ship production traffic. Swapping in real clients later is a module binding change, not a rewrite of strategies or services.
+
+</details>
+
+<details>
+  <summary><b>feature - Passport (authentication)</b></summary>
+
+**Problem:** Hand-rolled auth in controllers couples HTTP handlers to one login mechanism and makes it costly to add OAuth, API keys, or other flows later.
+
+**Decision:** **Passport** with pluggable strategies—`LocalStrategy` for sign-in, `JwtStrategy` for protected routes—keeps verification in one place. Guards stay thin; swapping or extending auth means a new strategy, not rewriting business code. Protected notification routes are scoped to the authenticated owner.
+
+</details>
+
+<details>
+  <summary><b>feature - Repository layer (persistence)</b></summary>
+
+**Problem:** Services that call TypeORM directly are hard to unit-test and tightly bound to SQL/ORM details, which increases friction when persistence needs to change.
+
+**Decision:** Domain services depend on `UsersRepository` and `NotificationsRepository` interfaces, injected via tokens, with TypeORM implementations behind them. Persistence queries live at the boundary; services express intent (`findAllByUserId`, `updateByIdAndUserId`) without ORM leakage.
+
+</details>
+
+<details>
+  <summary><b>feature - Controlled migrations (<code>synchronize: false</code>)</b></summary>
+
+**Problem:** Letting the ORM auto-sync schema in production risks silent drift, data loss, and environments that do not match each other.
+
+**Decision:** **PostgreSQL** schema evolves only through **versioned TypeORM migrations** checked into the repo. `synchronize: false` keeps the database state explicit and reviewable; dev, test, and CI apply the same migration chain (`pnpm migration:run`) so schema integrity is a deliberate act, not a side effect of booting the app.
+
+</details>
+
+<details>
+  <summary><b>docs - Swagger / live API documentation</b></summary>
 
 **Problem:** Undocumented APIs become tribal knowledge; handwritten specs drift from code.
 
@@ -148,7 +148,7 @@ Brief rationale for the main Phase 1 design choices. Expand each item for detail
 </details>
 
 <details>
-  <summary><b>URI versioning (<code>/v1/...</code>)</b></summary>
+  <summary><b>feature - URI versioning (<code>/v1/...</code>)</b></summary>
 
 **Problem:** Breaking changes on a single unversioned API force all consumers to upgrade in lockstep.
 
@@ -157,7 +157,7 @@ Brief rationale for the main Phase 1 design choices. Expand each item for detail
 </details>
 
 <details>
-  <summary><b>Git hooks (Husky + lint-staged)</b></summary>
+  <summary><b>CI/CD - Git hooks (Husky + lint-staged)</b></summary>
 
 **Problem:** Without local checks, unformatted or lint-failing code can reach the remote before CI catches it, slowing review and breaking the pipeline.
 
@@ -166,7 +166,7 @@ Brief rationale for the main Phase 1 design choices. Expand each item for detail
 </details>
 
 <details>
-  <summary><b>CI/CD (CircleCI)</b></summary>
+  <summary><b>CI/CD - CircleCI badges</b></summary>
 
 **Problem:** Without automated checks, regressions reach main and environments diverge from what was reviewed locally.
 
@@ -175,7 +175,7 @@ Brief rationale for the main Phase 1 design choices. Expand each item for detail
 </details>
 
 <details>
-  <summary><b>Docker quick-start scripts (<code>up_dev.sh</code> / <code>up_test.sh</code>)</b></summary>
+  <summary><b>quick start - Docker quick-start scripts (<code>up_dev.sh</code> / <code>up_test.sh</code>)</b></summary>
 
 **Problem:** Requiring Node, pnpm, local Postgres, env files, and manual migration commands raises the barrier for reviewers and hides environment drift between machines.
 
