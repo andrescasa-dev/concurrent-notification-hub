@@ -1,7 +1,8 @@
-# Enterprise Multi-Channel Notification Engine — Core V1
+# Concurrent Notification Hub — Core V1
 
-<!-- TODO: Add CircleCI badge when the pipeline URL is available -->
-<!-- ![CircleCI](https://circleci.com/gh/<org>/<repo>.svg?style=shield) -->
+> [!NOTE]
+> **Transparency disclaimer**  
+> This repository was built with leverage from **Claude Sonnet** inside the **Cursor** IDE. The **architecture and main technical decisions are mine**; the AI helped me **implement them faster** (boilerplate, refactors, tests, and documentation). I am sharing this openly so reviewers can judge both the design choices and how the work was produced.
 
 **Project highlights (Phase 1)**
 
@@ -58,71 +59,49 @@ In **Phase 1**, this engine **centralizes** authenticated users’ notification 
 
 Brief rationale for the main Phase 1 design choices. Expand each item for details.
 
-<details>
-  <summary><b>Clean architecture (layers and client boundary)</b></summary>
+**Clean architecture (layers and client boundary)**
 
 **Problem:** Mixing HTTP, business rules, SQL, and third-party HTTP calls in one module creates tight coupling and makes the system hard to test or evolve.
 
 **Decision:** The codebase follows a **clean, layered layout**: controllers handle HTTP, services orchestrate use cases, repositories isolate persistence, strategies own channel-specific send rules, and a dedicated **client layer** (`clients/email`, `clients/sms`, `clients/push`) talks to external providers behind interfaces (`IEmailClient`, `ISmsClient`, `IPushClient`). Inward dependencies point at abstractions; infrastructure stays at the edges.
 
-</details>
-
-<details>
-  <summary><b>Strategy pattern (notification channels)</b></summary>
+**Strategy pattern (notification channels)**
 
 **Problem:** Channel logic tends to accumulate in a single service (`if channel === email …`) so every new provider forces edits to existing code and violates the **Open/Closed** principle.
 
 **Decision:** Each channel (Email, SMS, Push) is a `NotificationSendingStrategy`. The service resolves the implementation from `channel` and calls `send()` without knowing provider details. New channels are added by registering another strategy, not by branching in the core.
 
-</details>
-
-<details>
-  <summary><b>Discriminated DTO (<code>channel</code> + <code>notification</code>)</b></summary>
+**Discriminated DTO (**`channel` **+** `notification`**)**
 
 **Problem:** A single flat body cannot enforce different required fields per channel (recipient email vs. phone vs. device token) without leaking validation into the service layer.
 
 **Decision:** `CreateNotificationDto` carries a `channel` discriminator and a nested `notification` object whose class is selected at runtime (`CreateEmailDto`, `CreateSmsDto`, `CreatePushDto`). Validation and Swagger `oneOf` stay aligned with the chosen channel before any strategy runs.
 
-</details>
-
-<details>
-  <summary><b>Simulated providers (client layer)</b></summary>
+**Simulated providers (client layer)**
 
 **Problem:** Wiring real Gmail, Twilio, or FCM in a take-home adds API keys, network flakiness, and review friction without proving stronger Node/Nest design skills.
 
 **Decision:** External sends go through the **client layer** with **simulated implementations** (`SimulatedGmailEmailClient`, `SimulatedSmsClient`, `SimulatedPushClient`) that return deterministic IDs and log behavior. Strategies still exercise real channel rules (validation, templates, length limits). The goal is to demonstrate architecture and Node expertise—not to ship production traffic. Swapping in real clients later is a module binding change, not a rewrite of strategies or services.
 
-</details>
-
-<details>
-  <summary><b>Passport (authentication)</b></summary>
+**Passport (authentication)**
 
 **Problem:** Hand-rolled auth in controllers couples HTTP handlers to one login mechanism and makes it costly to add OAuth, API keys, or other flows later.
 
 **Decision:** **Passport** with pluggable strategies—`LocalStrategy` for sign-in, `JwtStrategy` for protected routes—keeps verification in one place. Guards stay thin; swapping or extending auth means a new strategy, not rewriting business code. Protected notification routes are scoped to the authenticated owner.
 
-</details>
-
-<details>
-  <summary><b>Repository layer (persistence)</b></summary>
+**Repository layer (persistence)**
 
 **Problem:** Services that call TypeORM directly are hard to unit-test and tightly bound to SQL/ORM details, which increases friction when persistence needs to change.
 
 **Decision:** Domain services depend on `UsersRepository` and `NotificationsRepository` interfaces, injected via tokens, with TypeORM implementations behind them. Persistence queries live at the boundary; services express intent (`findAllByUserId`, `updateByIdAndUserId`) without ORM leakage.
 
-</details>
-
-<details>
-  <summary><b>Controlled migrations (<code>synchronize: false</code>)</b></summary>
+**Controlled migrations (**`synchronize: false`**)**
 
 **Problem:** Letting the ORM auto-sync schema in production risks silent drift, data loss, and environments that do not match each other.
 
 **Decision:** **PostgreSQL** schema evolves only through **versioned TypeORM migrations** checked into the repo. `synchronize: false` keeps the database state explicit and reviewable; dev, test, and CI apply the same migration chain (`pnpm migration:run`) so schema integrity is a deliberate act, not a side effect of booting the app.
 
-</details>
-
-<details>
-  <summary><b>Pragmatic testing + dedicated integration database</b></summary>
+**Pragmatic testing + dedicated integration database**
 
 **Problem:** Mocking everything gives fast tests but misses migration bugs, constraints, and real query behavior; sharing the dev database with tests causes flaky runs and polluted local data.
 
@@ -135,34 +114,23 @@ Brief rationale for the main Phase 1 design choices. Expand each item for detail
 
 **Dev** Postgres (`docker-compose.yml`, port **5432**) and **test** Postgres (`docker-compose.test.yml`, port **5433**) use separate Compose project names so `down` on the test stack does not destroy dev data. Run all: `pnpm test:all`. Coverage: `pnpm test:cov`. With Docker: `./up_test.sh`.
 
-</details>
-
-<details>
-  <summary><b>Swagger / live API documentation</b></summary>
+**Swagger / live API documentation**
 
 **Problem:** Undocumented APIs become tribal knowledge; handwritten specs drift from code.
 
-**Decision:** **OpenAPI/Swagger** is generated from NestJS decorators and served at **`/docs`** when the app is running. Documentation stays in sync with the implementation—no separate spec files to maintain by hand. It is treated as part of the product surface for onboarding, client integration, and reviewing channel-specific payloads.
+**Decision:** **OpenAPI/Swagger** is generated from NestJS decorators and served at `**/docs`\*\* when the app is running. Documentation stays in sync with the implementation—no separate spec files to maintain by hand. It is treated as part of the product surface for onboarding, client integration, and reviewing channel-specific payloads.
 
-</details>
-
-<details>
-  <summary><b>URI versioning (<code>/v1/...</code>)</b></summary>
+**URI versioning (**`/v1/...`**)**
 
 **Problem:** Breaking changes on a single unversioned API force all consumers to upgrade in lockstep.
 
 **Decision:** NestJS **URI versioning** with `v1` as the default path prefix (e.g. `/v1/notifications`). Clients pin a stable contract; future versions can coexist without implicit breaking changes.
 
-</details>
-
-<details>
-  <summary><b>CI/CD (CircleCI)</b></summary>
+**CI/CD (CircleCI)**
 
 **Problem:** Without automated checks, regressions reach main and environments diverge from what was reviewed locally.
 
 **Decision:** Continuous integration on **CircleCI** (pipeline badge and URL to be added). The pipeline installs with `pnpm install --frozen-lockfile`, runs linting, and executes `pnpm test:all` on every change so merges stay green before deploy.
-
-</details>
 
 ---
 
@@ -172,7 +140,7 @@ Brief rationale for the main Phase 1 design choices. Expand each item for detail
 | ---------------------------- | ---------------------------------------------------------------------------------- |
 | **Backend Core**             | Node.js 24, NestJS 11, TypeScript, Passport (JWT / Local), class-validator, Helmet |
 | **Database & Persistence**   | PostgreSQL 16, TypeORM, programmatic migrations                                    |
-| **Dev Quality & Automation** | pnpm, Jest, ESLint, Prettier, Docker Compose, TypeORM CLI (`migration:*` scripts)  |
+| **Dev Quality & Automation** | pnpm, Jest, ESLint, Prettier, Docker Compose, TypeORM CLI (`migration:`\* scripts) |
 
 ---
 
@@ -199,8 +167,8 @@ chmod +x ./up_dev.sh
 ./up_dev.sh
 ```
 
-- Migrations run automatically, then the API listens on **http://localhost:3000**
-- **Swagger:** http://localhost:3000/docs
+- Migrations run automatically, then the API listens on **[http://localhost:3000](http://localhost:3000)**
+- **Swagger:** [http://localhost:3000/docs](http://localhost:3000/docs)
 - Auth is **JWT**: register via `POST /v1/users`, sign in via `POST /v1/auth/login`, then use **Authorize** in Swagger with `Bearer <access_token>`, or call the API with curl/Postman
 - Press **Ctrl+C** to stop the app
 
