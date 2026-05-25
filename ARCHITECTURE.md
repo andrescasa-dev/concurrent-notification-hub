@@ -1,4 +1,4 @@
-# Version 1
+# Phase 1
 
 ```mermaid
 flowchart LR
@@ -8,29 +8,35 @@ flowchart LR
         Email["Email Strategy"]
         SMS["SMS Strategy"]
         Push["Push Strategy"]
-  end
+ end
  subgraph NestJS_Core_Engine["NestJS Core Engine"]
         Controller["Notification Controller"]
         Auth["JWT Guard / Auth"]
         Strategy_Pattern
-  end
+ end
     Client["HTTP Client / Postman"] -- HTTPS / REST --> Auth
     Auth --> Controller
     Controller --> Service
     Service --> Strategy
-    Strategy -- Channel: Email --> Email
-    Strategy -- Channel: SMS --> SMS
-    Strategy -- Channel: Push --> Push
+    Strategy -- "Channel: Email" --> Email
+    Strategy -- "Channel: SMS" --> SMS
+    Strategy -- "Channel: Push" --> Push
     Service -- TypeORM / TCP --> DB[("PostgreSQL")]
     Email -- Mock API --> Provider1["Email Provider"]
     SMS -- Mock API --> Provider2["SMS Provider"]
     Push -- Mock API --> Provider3["Push Provider"]
 
-    style Strategy_Pattern fill:#f1f2ea,stroke:#cfd2c1,stroke-width:2px
-    style NestJS_Core_Engine fill:#e6f1f7,stroke:#bcd1db,stroke-width:1px
+    %% Estilos optimizados para modo oscuro
+    style Strategy_Pattern fill:#2d2d3a,stroke:#4a4a6a,stroke-width:2px,color:#e0e0e0
+    style NestJS_Core_Engine fill:#1e293b,stroke:#334155,stroke-width:1px,color:#e0e0e0
+
+    %% Opcional: Estilo global para nodos si es necesario
+    linkStyle default stroke:#94a3b8,stroke-width:2px
 ```
 
-# Version 2
+
+
+# Phase 2
 
 ```mermaid
 flowchart LR
@@ -63,12 +69,12 @@ flowchart LR
     end
 
     %% Relaciones de la Estrategia
-    Strategy -- Channel: Email --> Email
-    Strategy -- Channel: SMS --> SMS
-    Strategy -- Channel: Push --> Push
+    Strategy -- "Channel: Email" --> Email
+    Strategy -- "Channel: SMS" --> SMS
+    Strategy -- "Channel: Push" --> Push
 
     %% Persistencia y Terceros
-    Service -- TypeORM / TCP --> DB[("PostgreSQL")]
+    Service -- "TypeORM / TCP" --> DB[("PostgreSQL")]
     Worker -.->|Update Status| DB
     Email -- Mock API --> Provider1["Email Provider"]
     SMS -- Mock API --> Provider2["SMS Provider"]
@@ -77,12 +83,20 @@ flowchart LR
     %% Monitoreo en Tiempo Real (Fase 2)
     StreamServer -.->|Live Analytics| Dashboard["Next.js Dashboard"]
 
-    %% Estilos solicitados por el usuario
-    style Strategy_Pattern fill:#f1f2ea,stroke:#cfd2c1,stroke-width:2px
-    style NestJS_Core_Engine fill:#e6f1f7,stroke:#bcd1db,stroke-width:1px
+    %% Estilos optimizados para modo oscuro
 
-    %% Estilos adicionales para resaltar componentes de Fase 2
-    style Queue fill:#fff,stroke:#f96,stroke-width:2px,stroke-dasharray: 5 5
-    style StreamServer fill:#fff,stroke:#d4a017,stroke-dasharray: 5 5
-    style Dashboard fill:#f1f2ea,stroke:#d4a017,stroke-width:1pxc
+    %% Contenedores principales
+    style NestJS_Core_Engine fill:#1e293b,stroke:#475569,stroke-width:1px,color:#e2e8f0
+    style Strategy_Pattern fill:#2d2d3a,stroke:#4a4a6a,stroke-width:2px,color:#e2e8f0
+
+    %% Componentes Fase 2 (Dashed/Alert)
+    style Queue fill:#1e1e2e,stroke:#f59e0b,stroke-width:2px,stroke-dasharray: 5 5,color:#fbbf24
+    style StreamServer fill:#1e1e2e,stroke:#eab308,stroke-dasharray: 5 5,color:#facc15
+    style Dashboard fill:#262626,stroke:#eab308,stroke-width:1px,color:#e2e8f0
+
+    %% Estilos de enlaces para contraste
+    linkStyle default stroke:#94a3b8,stroke-width:1.5px
 ```
+
+
+

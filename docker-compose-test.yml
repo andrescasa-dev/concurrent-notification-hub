@@ -1,0 +1,22 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: thc-api-test
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+    environment:
+      NODE_ENV: test
+      PORT: 3030
+      POSTGRES_HOST: postgres-test
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: thc_test
+      POSTGRES_HOST_PORT: 5432
+      JWT_SECRET: test-jwt-secret-for-docker-suite
+      JWT_EXPIRES_IN: 1d
+      CORS_ORIGIN: ''
+    command: >
+      sh -c "pnpm test:all"

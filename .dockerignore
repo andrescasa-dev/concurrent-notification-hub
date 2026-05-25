@@ -36,12 +36,6 @@ temp
 *.swo
 .DS_Store
 
-# Tests (not needed for typical production runtime image)
-test
-**/*.spec.ts
-**/*.test.ts
-e2e
-
 # Documentation (not needed in the image)
 *.md
 
