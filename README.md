@@ -1,6 +1,7 @@
 # Concurrent Notification Hub — Core V1
 
-[![CI](https://github.com/andrescasa-dev/concurrent-notification-hub/actions/workflows/ci.yml/badge.svg)](https://github.com/andrescasa-dev/concurrent-notification-hub/actions/workflows/ci.yml)
+[![CI](https://github.com/andrescasa-dev/concurrent-notification-hub/actions/workflows/ci.yml/badge.svg?branch=main&event=push)](https://github.com/andrescasa-dev/concurrent-notification-hub/actions/workflows/ci.yml)
+
 [![Coverage Status](https://coveralls.io/repos/github/andrescasa-dev/concurrent-notification-hub/badge.svg?branch=main)](https://coveralls.io/github/andrescasa-dev/concurrent-notification-hub?branch=main)
 
 > [!NOTE]
@@ -69,10 +70,10 @@ Brief rationale for the main Phase 1 design choices. Expand each item for detail
 
 **Decision:** Tests are split by **architectural boundary** so failures pinpoint the layer at fault:
 
-| Suite | Scope | Isolation |
-| --- | --- | --- |
-| **Unit** (`pnpm test`) | Strategy rules, services, guards—business logic without I/O | In-memory mocks; `test/jest/unit.config.cjs` |
-| **E2E** (`pnpm test:e2e`) | Full HTTP cycle: auth, JWT, CRUD, send, real Postgres | Dedicated DB on port **5433**; migrations via `test/utils/setup.ts`; `test/jest/e2e.json` |
+| Suite                     | Scope                                                       | Isolation                                                                                 |
+| ------------------------- | ----------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| **Unit** (`pnpm test`)    | Strategy rules, services, guards—business logic without I/O | In-memory mocks; `test/jest/unit.config.cjs`                                              |
+| **E2E** (`pnpm test:e2e`) | Full HTTP cycle: auth, JWT, CRUD, send, real Postgres       | Dedicated DB on port **5433**; migrations via `test/utils/setup.ts`; `test/jest/e2e.json` |
 
 **Dev** Postgres (`docker-compose.yml`, port **5432**) and **test** Postgres (`docker-compose.test.yml`, port **5433**) use separate Compose project names so `down` on the test stack does not destroy dev data. Run all: `pnpm test:all`. Coverage: `pnpm test:cov`. With Docker: `./up_test.sh`.
 
@@ -190,10 +191,10 @@ Brief rationale for the main Phase 1 design choices. Expand each item for detail
 
 ## Technical Stack
 
-| Layer                        | Technologies                                                                       |
-| ---------------------------- | ---------------------------------------------------------------------------------- |
-| **Backend Core**             | Node.js 24, NestJS 11, TypeScript, Passport (JWT / Local), class-validator, Helmet |
-| **Database & Persistence**   | PostgreSQL 16, TypeORM, programmatic migrations                                    |
+| Layer                        | Technologies                                                                                                                      |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| **Backend Core**             | Node.js 24, NestJS 11, TypeScript, Passport (JWT / Local), class-validator, Helmet                                                |
+| **Database & Persistence**   | PostgreSQL 16, TypeORM, programmatic migrations                                                                                   |
 | **Dev Quality & Automation** | pnpm, Jest, ESLint, Prettier, Husky, lint-staged, GitHub Actions, Coveralls, Docker Compose, TypeORM CLI (`migration:`\* scripts) |
 
 ---
