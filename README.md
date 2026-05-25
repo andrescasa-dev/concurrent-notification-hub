@@ -173,7 +173,7 @@ Brief rationale for the main Phase 1 design choices. Expand each item for detail
 
 **Problem:** Without automated checks, regressions reach main and environments diverge from what was reviewed locally.
 
-**Decision:** Continuous integration on **GitHub Actions** ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)). On every push to `main` and on pull requests, the pipeline installs with `pnpm install --frozen-lockfile`, runs ESLint, executes `pnpm test:cov` (unit + e2e against Postgres 16), and uploads coverage to **Coveralls**. CI and coverage badges are shown at the top of this README.
+**Decision:** Continuous integration on **GitHub Actions** ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)). On every push to `main` and on pull requests, the pipeline installs with `pnpm install --frozen-lockfile`, runs ESLint, builds with `pnpm build`, executes `pnpm test:cov` (unit + e2e against Postgres 16), and uploads coverage to **Coveralls**. CI and coverage badges are shown at the top of this README.
 
 </details>
 
