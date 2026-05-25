@@ -1,5 +1,8 @@
 # Concurrent Notification Hub — Core V1
 
+[![CI](https://github.com/andrescasa-dev/concurrent-notification-hub/actions/workflows/ci.yml/badge.svg)](https://github.com/andrescasa-dev/concurrent-notification-hub/actions/workflows/ci.yml)
+[![Coverage Status](https://coveralls.io/repos/github/andrescasa-dev/concurrent-notification-hub/badge.svg?branch=main)](https://coveralls.io/github/andrescasa-dev/concurrent-notification-hub?branch=main)
+
 > [!NOTE]
 > **Transparency disclaimer**  
 > While all architectural and technical decisions were entirely mine, I utilized Claude and Cursor to accelerate the development phase. The AI assisted with implementing boilerplate code, refactors, writing tests, and generating documentation. I am sharing this openly so reviewers can evaluate both the design choices and the modern workflow used to produce them.
@@ -166,11 +169,11 @@ Brief rationale for the main Phase 1 design choices. Expand each item for detail
 </details>
 
 <details>
-  <summary><b>CI/CD - CircleCI badges</b></summary>
+  <summary><b>CI/CD - GitHub Actions + Coveralls</b></summary>
 
 **Problem:** Without automated checks, regressions reach main and environments diverge from what was reviewed locally.
 
-**Decision:** Continuous integration on **CircleCI** (pipeline badge and URL to be added). The pipeline installs with `pnpm install --frozen-lockfile`, runs linting, and executes `pnpm test:all` on every change so merges stay green before deploy.
+**Decision:** Continuous integration on **GitHub Actions** ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)). On every push to `main` and on pull requests, the pipeline installs with `pnpm install --frozen-lockfile`, runs ESLint, executes `pnpm test:cov` (unit + e2e against Postgres 16), and uploads coverage to **Coveralls**. CI and coverage badges are shown at the top of this README.
 
 </details>
 
@@ -191,7 +194,7 @@ Brief rationale for the main Phase 1 design choices. Expand each item for detail
 | ---------------------------- | ---------------------------------------------------------------------------------- |
 | **Backend Core**             | Node.js 24, NestJS 11, TypeScript, Passport (JWT / Local), class-validator, Helmet |
 | **Database & Persistence**   | PostgreSQL 16, TypeORM, programmatic migrations                                    |
-| **Dev Quality & Automation** | pnpm, Jest, ESLint, Prettier, Husky, lint-staged, Docker Compose, TypeORM CLI (`migration:`\* scripts) |
+| **Dev Quality & Automation** | pnpm, Jest, ESLint, Prettier, Husky, lint-staged, GitHub Actions, Coveralls, Docker Compose, TypeORM CLI (`migration:`\* scripts) |
 
 ---
 
@@ -201,7 +204,6 @@ Brief rationale for the main Phase 1 design choices. Expand each item for detail
 
 - **Phase 2 architecture** — async job processing, background workers, and real-time event streaming layered on the same Strategy boundaries ([diagram](./ARCHITECTURE.md#phase-2))
 - **Real external providers** — replace simulated clients with production Email/SMS/Push integrations
-- **CircleCI badge and pipeline URL** — visible CI status on the README
 - **Operations dashboard** — UI for monitoring sends under high volume
 - **Rate limiting and delivery retries** — resilience when provider APIs throttle or fail
 
