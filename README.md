@@ -118,7 +118,7 @@ Brief rationale for the main Phase 1 design choices. Expand each item for detail
 
 **Problem:** Undocumented APIs become tribal knowledge; handwritten specs drift from code.
 
-**Decision:** **OpenAPI/Swagger** is generated from NestJS decorators and served at `**/docs`\*\* when the app is running. Documentation stays in sync with the implementation—no separate spec files to maintain by hand. It is treated as part of the product surface for onboarding, client integration, and reviewing channel-specific payloads.
+**Decision:** **OpenAPI/Swagger** is generated from NestJS decorators and served at **`/docs`** when the app is running. Documentation stays in sync with the implementation—no separate spec files to maintain by hand. It is treated as part of the product surface for onboarding, client integration, and reviewing channel-specific payloads.
 
 **URI versioning (**`/v1/...`**)**
 
@@ -131,6 +131,12 @@ Brief rationale for the main Phase 1 design choices. Expand each item for detail
 **Problem:** Without automated checks, regressions reach main and environments diverge from what was reviewed locally.
 
 **Decision:** Continuous integration on **CircleCI** (pipeline badge and URL to be added). The pipeline installs with `pnpm install --frozen-lockfile`, runs linting, and executes `pnpm test:all` on every change so merges stay green before deploy.
+
+**Docker quick-start scripts (`up_dev.sh` / `up_test.sh`)**
+
+**Problem:** Requiring Node, pnpm, local Postgres, env files, and manual migration commands raises the barrier for reviewers and hides environment drift between machines.
+
+**Decision:** Added bash entrypoints—`./up_dev.sh` (API + Postgres + migrations) and `./up_test.sh` (test Postgres + full suite)—wired through Docker Compose overrides. The **only requirement** to run the app or tests is **Docker** (and Compose v2); no local Node toolchain needed. See [Quick start](#quick-start).
 
 ---
 
