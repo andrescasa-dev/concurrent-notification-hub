@@ -1,14 +1,10 @@
-# Concurrent Notification Hub — Core V1
+# Enterprise Notification Hub - Core V1
 
 [![CI](https://github.com/andrescasa-dev/concurrent-notification-hub/actions/workflows/ci.yml/badge.svg?branch=main&event=push)](https://github.com/andrescasa-dev/concurrent-notification-hub/actions/workflows/ci.yml)
 
 [![Coverage Status](https://coveralls.io/repos/github/andrescasa-dev/concurrent-notification-hub/badge.svg?branch=main)](https://coveralls.io/github/andrescasa-dev/concurrent-notification-hub?branch=main)
 
 Production docs: [https://concurrent-notification-hub-production.up.railway.app/docs](https://concurrent-notification-hub-production.up.railway.app/docs).
-
-> [!NOTE]
-> **Transparency disclaimer**  
-> While all architectural and technical decisions were entirely mine, I utilized Claude and Cursor to accelerate the development phase. The AI assisted with implementing boilerplate code, refactors, writing tests, and generating documentation. I am sharing this openly so reviewers can evaluate both the design choices and the modern workflow used to produce them.
 
 **Project highlights (Phase 1)**
 
@@ -52,6 +48,10 @@ flowchart LR
 Further detail: [ARCHITECTURE.md — Phase 1](./ARCHITECTURE.md#phase-1).
 
 ---
+
+> [!NOTE]
+> **Transparency disclaimer**  
+> While all architectural and technical decisions were entirely mine, I utilized Claude and Cursor to accelerate the development phase. The AI assisted with implementing boilerplate code, refactors, writing tests, and generating documentation. I am sharing this openly so reviewers can evaluate both the design choices and the modern workflow used to produce them.
 
 ## System Overview & Problem Solved
 
