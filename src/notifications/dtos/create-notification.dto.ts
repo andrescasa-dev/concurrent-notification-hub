@@ -13,7 +13,7 @@ export class CreateNotificationDto {
       'Canal por el que se enviará la notificación. Determina la forma esperada del campo `notification`.',
     enum: NotificationsChannelsEnum,
     enumName: 'NotificationsChannelsEnum',
-    example: NotificationsChannelsEnum.SMS,
+    example: NotificationsChannelsEnum.EMAIL,
   })
   @IsNotEmpty()
   @IsEnum(NotificationsChannelsEnum)
