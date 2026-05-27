@@ -10,6 +10,7 @@
 
 **Project highlights (Phase 1)**
 
+- [Live API (production)](#live-api-production)
 - [Decisions taken](#decisions-taken)
 - [Future enhancements](#future-enhancements)
 - [Quick start](#quick-start)
@@ -48,6 +49,16 @@ flowchart LR
 ```
 
 Further detail: [ARCHITECTURE.md — Phase 1](./ARCHITECTURE.md#phase-1).
+
+---
+
+## Live API (production)
+
+The API is deployed on **Railway** with continuous deployment from `main`.
+
+- **Swagger:** [https://concurrent-notification-hub-production.up.railway.app/docs](https://concurrent-notification-hub-production.up.railway.app/docs)
+
+Use the same JWT flow as locally: register via `POST /v1/users`, sign in via `POST /v1/auth/login`, then **Authorize** in Swagger with `Bearer <access_token>`.
 
 ---
 
@@ -147,7 +158,7 @@ Brief rationale for the main Phase 1 design choices. Expand each item for detail
 
 **Problem:** Undocumented APIs become tribal knowledge; handwritten specs drift from code.
 
-**Decision:** **OpenAPI/Swagger** is generated from NestJS decorators and served at **`/docs`** when the app is running. Documentation stays in sync with the implementation—no separate spec files to maintain by hand. It is treated as part of the product surface for onboarding, client integration, and reviewing channel-specific payloads.
+**Decision:** **OpenAPI/Swagger** is generated from NestJS decorators and served at **`/docs`** when the app is running. Documentation stays in sync with the implementation—no separate spec files to maintain by hand. It is treated as part of the product surface for onboarding, client integration, and reviewing channel-specific payloads. Production docs: [https://concurrent-notification-hub-production.up.railway.app/docs](https://concurrent-notification-hub-production.up.railway.app/docs).
 
 </details>
 
@@ -175,6 +186,15 @@ Brief rationale for the main Phase 1 design choices. Expand each item for detail
 **Problem:** Without automated checks, regressions reach main and environments diverge from what was reviewed locally.
 
 **Decision:** Continuous integration on **GitHub Actions** ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)). On every push to `main` and on pull requests, the pipeline installs with `pnpm install --frozen-lockfile`, runs ESLint, builds with `pnpm build`, executes `pnpm test:cov` (unit + e2e against Postgres 16), and uploads coverage to **Coveralls**. CI and coverage badges are shown at the top of this README.
+
+</details>
+
+<details>
+  <summary><b>CI/CD - Railway (production deployment)</b></summary>
+
+**Problem:** Reviewers and integrators need a stable hosted environment without cloning the repo or running Docker locally.
+
+**Decision:** **Railway** deploys the API on every merge to `main` (continuous deployment). The live Swagger UI is at [https://concurrent-notification-hub-production.up.railway.app/docs](https://concurrent-notification-hub-production.up.railway.app/docs). See [Live API (production)](#live-api-production).
 
 </details>
 
@@ -222,7 +242,8 @@ chmod +x ./up_dev.sh
 ```
 
 - Migrations run automatically, then the API listens on **[http://localhost:3000](http://localhost:3000)**
-- **Swagger:** [http://localhost:3000/docs](http://localhost:3000/docs)
+- **Swagger (local):** [http://localhost:3000/docs](http://localhost:3000/docs)
+- **Swagger (production):** [https://concurrent-notification-hub-production.up.railway.app/docs](https://concurrent-notification-hub-production.up.railway.app/docs)
 - Auth is **JWT**: register via `POST /v1/users`, sign in via `POST /v1/auth/login`, then use **Authorize** in Swagger with `Bearer <access_token>`, or call the API with curl/Postman
 - Press **Ctrl+C** to stop the app
 
