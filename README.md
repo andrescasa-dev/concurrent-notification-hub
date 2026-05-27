@@ -4,7 +4,7 @@
 
 [![Coverage Status](https://coveralls.io/repos/github/andrescasa-dev/concurrent-notification-hub/badge.svg?branch=main)](https://coveralls.io/github/andrescasa-dev/concurrent-notification-hub?branch=main)
 
-Production docs: [https://concurrent-notification-hub-production.up.railway.app/docs](https://concurrent-notification-hub-production.up.railway.app/docs).
+Production docs: [https://notification-hub.up.railway.app/docs](https://notification-hub.up.railway.app/docs).
 
 **Project highlights (Phase 1)**
 
