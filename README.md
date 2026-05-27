@@ -4,13 +4,14 @@
 
 [![Coverage Status](https://coveralls.io/repos/github/andrescasa-dev/concurrent-notification-hub/badge.svg?branch=main)](https://coveralls.io/github/andrescasa-dev/concurrent-notification-hub?branch=main)
 
+Production docs: [https://concurrent-notification-hub-production.up.railway.app/docs](https://concurrent-notification-hub-production.up.railway.app/docs).
+
 > [!NOTE]
 > **Transparency disclaimer**  
 > While all architectural and technical decisions were entirely mine, I utilized Claude and Cursor to accelerate the development phase. The AI assisted with implementing boilerplate code, refactors, writing tests, and generating documentation. I am sharing this openly so reviewers can evaluate both the design choices and the modern workflow used to produce them.
 
 **Project highlights (Phase 1)**
 
-- [Live API (production)](#live-api-production)
 - [Decisions taken](#decisions-taken)
 - [Future enhancements](#future-enhancements)
 - [Quick start](#quick-start)
@@ -49,16 +50,6 @@ flowchart LR
 ```
 
 Further detail: [ARCHITECTURE.md — Phase 1](./ARCHITECTURE.md#phase-1).
-
----
-
-## Live API (production)
-
-The API is deployed on **Railway** with continuous deployment from `main`.
-
-- **Swagger:** [https://concurrent-notification-hub-production.up.railway.app/docs](https://concurrent-notification-hub-production.up.railway.app/docs)
-
-Use the same JWT flow as locally: register via `POST /v1/users`, sign in via `POST /v1/auth/login`, then **Authorize** in Swagger with `Bearer <access_token>`.
 
 ---
 
@@ -158,7 +149,7 @@ Brief rationale for the main Phase 1 design choices. Expand each item for detail
 
 **Problem:** Undocumented APIs become tribal knowledge; handwritten specs drift from code.
 
-**Decision:** **OpenAPI/Swagger** is generated from NestJS decorators and served at **`/docs`** when the app is running. Documentation stays in sync with the implementation—no separate spec files to maintain by hand. It is treated as part of the product surface for onboarding, client integration, and reviewing channel-specific payloads. Production docs: [https://concurrent-notification-hub-production.up.railway.app/docs](https://concurrent-notification-hub-production.up.railway.app/docs).
+**Decision:** **OpenAPI/Swagger** is generated from NestJS decorators and served at **`/docs`** when the app is running. Documentation stays in sync with the implementation—no separate spec files to maintain by hand. It is treated as part of the product surface for onboarding, client integration, and reviewing channel-specific payloads.
 
 </details>
 
@@ -194,7 +185,7 @@ Brief rationale for the main Phase 1 design choices. Expand each item for detail
 
 **Problem:** Reviewers and integrators need a stable hosted environment without cloning the repo or running Docker locally.
 
-**Decision:** **Railway** deploys the API on every merge to `main` (continuous deployment). The live Swagger UI is at [https://concurrent-notification-hub-production.up.railway.app/docs](https://concurrent-notification-hub-production.up.railway.app/docs). See [Live API (production)](#live-api-production).
+**Decision:** **Railway** deploys the API on every merge to `main` (continuous deployment). Production Swagger is linked at the top of this README.
 
 </details>
 
@@ -242,8 +233,7 @@ chmod +x ./up_dev.sh
 ```
 
 - Migrations run automatically, then the API listens on **[http://localhost:3000](http://localhost:3000)**
-- **Swagger (local):** [http://localhost:3000/docs](http://localhost:3000/docs)
-- **Swagger (production):** [https://concurrent-notification-hub-production.up.railway.app/docs](https://concurrent-notification-hub-production.up.railway.app/docs)
+- **Swagger:** [http://localhost:3000/docs](http://localhost:3000/docs)
 - Auth is **JWT**: register via `POST /v1/users`, sign in via `POST /v1/auth/login`, then use **Authorize** in Swagger with `Bearer <access_token>`, or call the API with curl/Postman
 - Press **Ctrl+C** to stop the app
 

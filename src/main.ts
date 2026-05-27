@@ -49,8 +49,11 @@ async function bootstrap() {
   });
 
   const swaggerConfig = new DocumentBuilder()
-    .setTitle('API')
-    .setDescription('HTTP API')
+    .setTitle('Enterprise Notification Hub')
+    .setDescription(
+      'REST API for authenticated users to manage and send notifications (email, SMS, push). ' +
+        'This is a technical exercise to demonstrate mastery—not intended for production or real application providers.',
+    )
     .setVersion('1.0')
     .addBearerAuth()
     .build();

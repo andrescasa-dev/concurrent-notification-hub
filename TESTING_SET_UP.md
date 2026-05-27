@@ -69,4 +69,4 @@ The e2e block is **duplicated** between `test/jest/e2e.json` and the `integratio
 - **E2e file names:** `*.e2e-spec.ts` under `test/` or under `src/` when colocated with a module.
 - **Application code language:** English (including comments in test utilities).
 
-For product and architecture context, see [`docs_ia/PROYECT.md`](docs_ia/PROYECT.md) if present in your branch.
+For product and architecture context, see [README.md](README.md).
